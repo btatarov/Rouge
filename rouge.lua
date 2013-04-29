@@ -141,6 +141,11 @@ function string:capitalize()
     return (self:gsub("^%l", string.upper))
 end
 
+function string:html_escape()
+    local esc, i = self:gsub('&', '&amp;'):gsub('<', '&lt;'):gsub('>', '&gt;')
+    return esc
+end
+
 function file_exists(name)
    local f=io.open(name,"r")
    if f~=nil then io.close(f) return true else return false end
