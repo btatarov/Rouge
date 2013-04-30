@@ -2,11 +2,43 @@ require "rouge"
 
 local M = {}
 
+local BaseModel
 local Model
 local BaseField
 local CharField
 
+function Model_fieldAccess(self, key)
+	local object = getmetatable(self).__object
+	local value = nil
+
+	if key ~= nil then
+		if object.fields and object.fields[key] then value = object.fields[key].value
+		else value = object[key] end
+	end
+
+	return value
+end
+
+function Model_fieldChange(self, key, value)
+	local object = getmetatable(self).__object
+
+	if key ~= nil then
+		if object.fields and object.fields[key] then object.fields[key].value = value
+		else object[key] = value end
+	end
+end
+
+
+BaseModel = {}
+
+function BaseModel.new()
+	local proxy = setmetatable({}, { __newindex = Model_fieldChange, __index = Model_fieldAccess, __object = {} })
+    return proxy
+end
+
+
 Model = class()
+Model.__factory = BaseModel
 M.Model = Model
 
 function Model:init(fields)
@@ -16,29 +48,12 @@ function Model:init(fields)
 		self.fields[name] = value
 		if not value.verbose then value.verbose = string.capitalize(name) end
 	end
-
-	getmetatable(self).__index = Model._fieldAccess
-	getmetatable(self).__newindex = Model._fieldChange
-end
-
-function Model._fieldAccess(self, key)
-	local value = nil
-	if key ~= nil then
-		if self.fields[key] then value = self.fields[key].value
-		else value = self[key] end
-	end
-
-	return value
-end
-
-function Model._fieldChange(self, key, value)
-	if key ~= nil then
-		if self.fields[key] then self.fields[key].value = value
-		else self[key] = value end
-	end
 end
 
 function Model:save()
+	for key, value in pairs(self.fields) do
+		print(key, value.value)
+	end
 end
 
 

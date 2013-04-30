@@ -18,14 +18,18 @@ function class:new(...)
     if self.__factory then
         obj = self.__factory.new()
         table.copy(self, obj)
+        self = getmetatable(obj).__object
     else
         obj = {__index = self}
         setmetatable(obj, obj)
     end
     
     if obj.init then
-        obj:init(...)
+        obj.init(self, ...)
     end
+
+    obj.new = nil
+    obj.init = nil
     
     return obj
 end
