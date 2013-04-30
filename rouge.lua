@@ -26,9 +26,6 @@ function class:new(...)
     if obj.init then
         obj:init(...)
     end
-
-    obj.new = nil
-    obj.init = nil
     
     return obj
 end
@@ -146,6 +143,10 @@ function string:html_escape()
     return esc
 end
 
+function string:trim(s)
+  return self:gsub("^%s*(.-)%s*$", "%1")
+end
+
 function file_exists(name)
    local f=io.open(name,"r")
    if f~=nil then io.close(f) return true else return false end
@@ -161,4 +162,21 @@ function url(pattern, controller, action)
 		namespace = controller[1]
 	end
 	return {pattern = pattern, namespace = namespace, controller = controller, action = action}
+end
+
+function locals()
+  local variables = {}
+  local idx = 1
+  while true do
+    local ln, lv = debug.getlocal(2, idx)
+    if ln ~= nil then
+      if ln ~= 'self' and ln:sub(1,1) ~= '(' then
+        variables[ln] = lv
+      end
+    else
+      break
+    end
+    idx = 1 + idx
+  end
+  return variables
 end

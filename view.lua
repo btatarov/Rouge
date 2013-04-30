@@ -18,7 +18,7 @@ local VIEW_ACTIONS = {
     end,
 }
 
-local function render_view(tmpl, params, namespace)
+function render_view(tmpl, params, namespace)
 	if not namespace then namespace = '' else namespace = namespace .. '/' end
 	params.params = params
 	params.namespace = namespace
@@ -38,18 +38,19 @@ local function render_view(tmpl, params, namespace)
         local output = text
 
         if act then
-            code[#code+1] =  '_result[#_result+1] = [[' .. text .. ']]'
+            code[#code+1] =  '_result[#_result+1] = [=[' .. text .. ']=]'
             code[#code+1] = act(block:sub(3,-3))
         elseif #block > 2 then
-            code[#code+1] = '_result[#_result+1] = [[' .. text .. block .. ']]'
+            code[#code+1] = '_result[#_result+1] = [=[' .. text .. block .. ']=]'
         else
-            code[#code+1] =  '_result[#_result+1] = [[' .. text .. ']]'
+            code[#code+1] =  '_result[#_result+1] = [=[' .. text .. ']=]'
         end
     end
 
     code[#code+1] = 'return table.concat(_result)'
 
     code = table.concat(code, '\n')
+
     local func, err = loadstring(code)
 
     if err then
