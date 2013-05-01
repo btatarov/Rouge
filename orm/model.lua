@@ -68,6 +68,7 @@ function BaseField:init(params)
 	if params.verbose ~= nil then self.verbose = params.verbose end
 end
 
+
 CharField = class(BaseField)
 M.CharField = CharField
 
@@ -75,5 +76,6 @@ function CharField:init(params)
 	BaseField.init(self)
 	if params.max_length ~= nil then self.max_length = params.max_length else self.max_length = 128 end
 end
+
 
 return M
